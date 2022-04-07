@@ -9,45 +9,48 @@ from skimage import io
 import os
 
 def focus_measure(im_to_convolove):
+    Sx = np.array([[1,2,1],[0,0,0],[-1,-2,-1]])
     Gx = mh.convolve(im_to_convolove, Sx)
     Gy = mh.convolve(im_to_convolove, Sx.transpose())
     G = np.square(Gx) + np.square(Gy)
     return np.square(np.std(G))
 
-p1 = input("Enter the first set of x-y coordinates (top left corner of desired region): ")
-x1,y1=p1.split(' ')
-p2 = input("Enter the second set of x-y coordinates (bottom right corner of desired region): ")
-x2,y2=p2.split(' ')
+def main():
+    p1 = input("Enter the first set of x-y coordinates (top left corner of desired region): ")
+    x1,y1=p1.split(' ')
+    p2 = input("Enter the second set of x-y coordinates (bottom right corner of desired region): ")
+    x2,y2=p2.split(' ')
 
-Sx = np.array([[1,2,1],[0,0,0],[-1,-2,-1]])
-FM=[]
-for pic in os.scandir('../captured_images'):
-    image = io.imread(pic.path)
-    # print(image)
-    image=image-np.amin(image)
-    image = image/np.amax(image)
+    FM=[]
+    for pic in os.scandir('../captured_images'):
+        image = io.imread(pic.path)
+        # print(image)
+        image=image-np.amin(image)
+        image = image/np.amax(image)
 
-    # image = mh.colors.rgb2gray(image[:,:,0:3])
-    im_crop = image[int(y1):int(y2),int(x1):int(x2)]
+        # image = mh.colors.rgb2gray(image[:,:,0:3])
+        im_crop = image[int(y1):int(y2),int(x1):int(x2)]
 
 
-    Gx = mh.convolve(im_crop, Sx)
-    Gy = mh.convolve(im_crop, Sx.transpose())
-    G = np.square(Gx) + np.square(Gy)
-    FM.append(focus_measure(im_crop))
-FM = FM - np.amin(FM)
-FM = FM/np.amax(FM)
-x_axis = []
-val=400
-for i in range(0,len(FM)):
-    x_axis.append(val)
-    val+=5
-print(x_axis[np.argmax(FM)])
-im=imread('../combined_image.png')
-f, (ax1,ax2)=plt.subplots(1,2,figsize=(6,2.3))
-ax1.imshow(im[int(y1):int(y2),int(x1):int(x2)])
-ax2.plot(x_axis,FM)
-plt.show()
+        # Gx = mh.convolve(im_crop, Sx)
+        # Gy = mh.convolve(im_crop, Sx.transpose())
+        # G = np.square(Gx) + np.square(Gy)
+        FM.append(focus_measure(im_crop))
+    FM = FM - np.amin(FM)
+    FM = FM/np.amax(FM)
+    x_axis = []
+    val=400
+    for i in range(0,len(FM)):
+        x_axis.append(val)
+        val+=5
+    print(x_axis[np.argmax(FM)])
+    im=imread('../combined_image.png')
+    f, (ax1,ax2)=plt.subplots(1,2,figsize=(6,2.3))
+    ax1.imshow(im[int(y1):int(y2),int(x1):int(x2)])
+    ax2.plot(x_axis,FM)
+    plt.show()
+if __name__ == "__main__":
+    main()
 # r = io.imread("red_real.png")
 # r = mh.colors.rgb2gray(r[:,:,0:3])
 # g = io.imread("green_real.png")

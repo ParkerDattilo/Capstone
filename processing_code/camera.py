@@ -45,11 +45,13 @@ def run_camera_distance(num_images, d_to_start, d_to_end, directory):
             images_taken=0
             dist_increments=(d_to_end-d_to_start)/num_images
             # object_distance=1356 # inf
-            done=subprocess.run(["ssh",  "pi@192.168.5.1", "python3", f"Desktop/translation_stage/move_distance.py {d_to_start}"],stdout=subprocess.DEVNULL)
+            done=subprocess.run(["ssh",  "pi@192.168.5.1", "python3", f"Desktop/translation_stage/move_dist.py {d_to_start}"],stdout=subprocess.DEVNULL)
             p=subprocess.Popen(["ssh",  "pi@192.168.5.1", "cat", "Desktop/translation_stage/pos.txt"],stdout=subprocess.PIPE)
             curpos, err = p.communicate()
+            curpos=curpos.decode("utf-8")
             if(done.check_returncode()==None):
-                for frame in cam.get_frame_generator(limit=num_images):
+                print(num_images)
+                for frame in cam.get_frame_generator(limit=int(num_images)):
                     if(done.check_returncode()==None):
                         image=np.reshape(frame.as_numpy_ndarray(),(frame.as_numpy_ndarray().shape[0],frame.as_numpy_ndarray().shape[1]))
                         im=Image.fromarray(image)
@@ -59,9 +61,10 @@ def run_camera_distance(num_images, d_to_start, d_to_end, directory):
                         print("Error communicating with translation stage")
                         sys.exit(0)
                     print(f"Image captured at {curpos}")
-                    done=subprocess.run(["ssh",  "pi@192.168.5.1", "python3", f"Desktop/translation_stage/move_distance.py {dist_increments}"],stdout=subprocess.DEVNULL)
+                    done=subprocess.run(["ssh",  "pi@192.168.5.1", "python3", f"Desktop/translation_stage/move_dist.py {dist_increments}"],stdout=subprocess.DEVNULL)
                     p=subprocess.Popen(["ssh",  "pi@192.168.5.1", "cat", "Desktop/translation_stage/pos.txt"],stdout=subprocess.PIPE)
                     curpos, err = p.communicate()
+                    curpos=curpos.decode("utf-8")
 
 def main():
     try:
