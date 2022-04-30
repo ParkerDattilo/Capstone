@@ -17,7 +17,11 @@ class Stage:
             fr.close()
 
     def update(self, toMove):
-        self.currPos+=toMove
+        if self.currPos + toMove > 140 or self.currPos + toMove < 0:
+            print("Error: attempting to move out of bounds")
+            sys.exit(-1)
+        else:
+            self.currPos+=toMove
         try:
             fw=open(path+"pos.txt","w")
             fw.write(str(self.currPos))
