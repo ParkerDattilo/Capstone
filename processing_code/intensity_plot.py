@@ -1,10 +1,7 @@
-from matplotlib.pyplot import gray, imread
+from matplotlib.pyplot import imread, plot, savefig
 import numpy as np
-import matplotlib.patches as patches
 import mahotas as mh
 import matplotlib.pyplot as plt
-from pylab import imshow, show, figure, title
-import time
 from skimage import io
 import os
 
@@ -15,14 +12,25 @@ def focus_measure(im_to_convolove):
     G = np.square(Gx) + np.square(Gy)
     return np.square(np.std(G))
 
-def main():
-    p1 = input("Enter the first set of x-y coordinates (top left corner of desired region): ")
-    x1,y1=p1.split(' ')
-    p2 = input("Enter the second set of x-y coordinates (bottom right corner of desired region): ")
-    x2,y2=p2.split(' ')
+def focus_plot(tl_coord, br_coord, plot_num):
+    # p1 = input("Enter the first set of x-y coordinates (top left corner of desired region): ")
+    # *6 is because displayed coordinates are downscaled from captured image coordinates by factor of 6
+    x1=tl_coord[0]*6
+    y1=tl_coord[1]*6
+    # p2 = input("Enter the second set of x-y coordinates (bottom right corner of desired region): ")
+    x2=br_coord[0]*6
+    y2=br_coord[1]*6
 
     FM=[]
+    first_im=-1
+    second_im=-1
     for pic in os.scandir('../captured_images'):
+        if second_im < 0 and first_im > 0:
+            second_im=float(pic.path.split('slice_')[1].split('.')[0])
+            print(f"second: {second_im}")
+        if first_im < 0:
+            first_im=float(pic.path.split('slice_')[1].split('.')[0])
+            print(f"first: {first_im}")
         image = io.imread(pic.path)
         # print(image)
         image=image-np.amin(image)
@@ -39,18 +47,22 @@ def main():
     FM = FM - np.amin(FM)
     FM = FM/np.amax(FM)
     x_axis = []
-    val=400
+    val=first_im
+    res=second_im-first_im
     for i in range(0,len(FM)):
         x_axis.append(val)
-        val+=5
+        val+=res
     print(x_axis[np.argmax(FM)])
-    im=imread('../combined_image.png')
+    im=imread('./combined_image.png')
     f, (ax1,ax2)=plt.subplots(1,2,figsize=(6,2.3))
     ax1.imshow(im[int(y1):int(y2),int(x1):int(x2)])
-    ax2.plot(x_axis,FM)
-    plt.show()
-if __name__ == "__main__":
-    main()
+    ax2.plot(x_axis,FM, 'r-')
+    ax2.set_xlabel("Wavelength (nm)")
+    ax2.set_ylabel("Normalized TENV Measure")
+    plt.savefig(f'../selected_plot_{plot_num}.png')
+    # plt.show()
+# if __name__ == "__main__":
+#     main()
 # r = io.imread("red_real.png")
 # r = mh.colors.rgb2gray(r[:,:,0:3])
 # g = io.imread("green_real.png")
@@ -134,5 +146,4 @@ if __name__ == "__main__":
 # print(FM_B)
 
 # plt.show()
-
 

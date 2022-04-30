@@ -1,7 +1,10 @@
 def bfd_calculation(wavelength, obj_dist):
     '''
-    This function calculates the bi-focal distance based on the given wavelength and obj_distance and the constant parameters of our optical
-    system. Input is assumed to be in nm for wavelength and mm for distance
+    This function calculates the bi-focal distance 
+    based on the given wavelength and obj_distance
+     and the constant parameters of our optical
+    system. Input is assumed to be in nm for 
+    wavelength and mm for distance
     '''
     wavelength*=10**-9
     obj_dist*=10**-3

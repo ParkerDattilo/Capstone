@@ -54,14 +54,16 @@ def wavelength_to_rgb(wavelength, gamma=0.8):
     B *= 255
     return [int(R), int(G), int(B)]
 
-start = time.perf_counter()
-cube = []
-for pic in os.scandir('./captured_images'):
-    im = imread(pic.path)
-    cube.append(im)
+def one_image():
+    start = time.perf_counter()
+    cube = []
+    print("reading captured images to make hypercube...")
+    for pic in os.scandir('../captured_images'):
+        im = imread(pic.path)
+        cube.append(im)
 
 # redIm = imread("red_real.png")
-# r = mh.colors.rgb2gray(redIm[:,:,0:3])
+#  r = mh.colors.rgb2gray(redIm[:,:,0:3])
 # blueIm = imread("blue_real.png")
 # b = mh.colors.rgb2gray(blueIm[:,:,0:3])
 # greenIm = imread("green_real.png")
@@ -69,16 +71,16 @@ for pic in os.scandir('./captured_images'):
 
 
 # image = np.array([r[:518,:620],g[:518,:620],b[:518,:620]])
-
-stack,h,w = np.shape(cube)
-# stack,h,w = image.shape
-focus = np.array([mh.sobel(t, just_filter=True) for t in cube])
-# focus = np.array([mh.sobel(t, just_filter=True) for t in image])
-best = np.argmax(focus, 0)
-# conv_width=40
-# conv_height=40
-# conv_filter=np.ones((conv_width,conv_height),bool)
-gray()
+    print("analyzing hypercube...")
+    stack,h,w = np.shape(cube)
+    # stack,h,w = image.shape
+    focus = np.array([mh.sobel(t, just_filter=True) for t in cube])
+    # focus = np.array([mh.sobel(t, just_filter=True) for t in image])
+    best = np.argmax(focus, 0)
+    # conv_width=40
+    # conv_height=40
+    # conv_filter=np.ones((conv_width,conv_height),bool)
+    gray()
 
 # r_sob = mh.sobel(r[:518,:620], just_filter=True)
 # v_r = mh.convolve(r_sob, conv_filter)
@@ -102,44 +104,44 @@ gray()
 # show()
 
 
-imshow(best)
-title("Best")
-show()
+# imshow(best)
+# title("Best")
+# show()
 
-color_map=[]
-wl=400
-for k in range(0,61):
-    color_map.append(wl)
-    wl+=5  
+# color_map=[]
+# wl=400
+# for k in range(0,151):
+#     color_map.append(wl)
+#     wl+=2  
 
-rgb = np.zeros((2056, 2464, 3))
-for i in range(0,2056):
-    for j in range(0,2464):
-        curr_wl=color_map[best[i,j]]
-        if curr_wl>=650:
-            rgb[i,j,:] = [0,0,0]
-        else:
-            rgb[i,j,:] = wavelength_to_rgb(curr_wl)
-        # if best[i,j] == 0:
-        #     # red
-        #     rgb[i,j,:] = wavelength_to_rgb(650)
-        # elif best[i,j] == 1:
-        #     # green
-        #     rgb[i,j,:] = wavelength_to_rgb(550)
-        # elif best [i,j] == 2:
-        #     # blue
-        #     rgb[i,j,:] = wavelength_to_rgb(450)
+# rgb = np.zeros((2056, 2464, 3))
+# for i in range(0,2056):
+#     for j in range(0,2464):
+#         curr_wl=color_map[best[i,j]]
+#         if curr_wl>=750:
+#             rgb[i,j,:] = [0,0,0]
+#         else:
+#             rgb[i,j,:] = wavelength_to_rgb(curr_wl)
+#         # if best[i,j] == 0:
+#         #     # red
+#         #     rgb[i,j,:] = wavelength_to_rgb(650)
+#         # elif best[i,j] == 1:
+#         #     # green
+#         #     rgb[i,j,:] = wavelength_to_rgb(550)
+#         # elif best [i,j] == 2:
+#         #     # blue
+#         #     rgb[i,j,:] = wavelength_to_rgb(450)
 
-imshow(rgb)
-title("RGB")
-show()
+# imshow(rgb)
+# title("RGB")
+# show()
 
-image = np.array(cube)
-image = image.reshape((stack, -1))
-image = image.transpose()
-r = image[np.arange(len(image)), best.ravel()]
-r = r.reshape((h,w))
-fig, ax = plt.subplots()
+    image = np.array(cube)
+    image = image.reshape((stack, -1))
+    image = image.transpose()
+    r = image[np.arange(len(image)), best.ravel()]
+    r = r.reshape((h,w))
+# fig, ax = plt.subplots()
 
 # rec_r = patches.Rectangle((r_mask[1][0]-conv_width,r_mask[0][0]-conv_height), 2*conv_width, 2*conv_height, linewidth=3, edgecolor='r', facecolor='none', ls='--')
 # rec_g = patches.Rectangle((g_mask[1][0]-conv_width,g_mask[0][0]-conv_height), 2*conv_width, 2*conv_height, linewidth=3, edgecolor='g', facecolor='none', ls='-')
@@ -148,12 +150,12 @@ fig, ax = plt.subplots()
 # ax.add_patch(rec_g)
 # ax.add_patch(rec_b)
 
-gray()
-ax.imshow(r)
-end = time.perf_counter()
-print(f"Done in {start-end:0.3f} seconds")
-imsave('combined_image.png',r)
-plt.title("Combined Image")
-plt.savefig("../processed_image.png")
-plt.show()
+    gray()
+    # ax.imshow(r)
+    end = time.perf_counter()
+    print(f"Done in {start-end:0.3f} seconds")
+    imsave('combined_image.png',r)
+# plt.title("Combined Image")
+# plt.savefig("../processed_image.png")
+# plt.show()
 

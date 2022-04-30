@@ -1,5 +1,6 @@
 from tracemalloc import start
 import wave
+import os
 from vimba import *
 import subprocess
 import numpy as np
@@ -11,6 +12,8 @@ def run_camera_wavelength(resolution=5, start_wavelength=400, end_wavelength=700
     '''this function takes a start, end wavelength then takes images at every resolution and stores them in dir. The object distance
     parameter is also required to determine movement on the pi. 
     '''
+    for pic in os.scandir(f'{directory}'):
+        os.remove(pic.path)
     wavelength_range=end_wavelength-start_wavelength
     with Vimba.get_instance() as vimba:
         cams = vimba.get_all_cameras()
